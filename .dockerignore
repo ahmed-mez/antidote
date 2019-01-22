@@ -1,3 +1,7 @@
-*
-!_build/default/rel/antidote
-!Dockerfiles
+# *
+# !_build/default/rel/antidote
+# !Dockerfiles
+**/*.beam
+**/*.rebar3
+**/rebar.lock
+_build/*
