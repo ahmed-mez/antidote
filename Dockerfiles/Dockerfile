@@ -18,26 +18,25 @@ RUN set -ex && \
   echo 'deb http://deb.debian.org/debian jessie-backports main' \
   > /etc/apt/sources.list.d/jessie-backports.list && \
   apt update -y && \
-  apt install -t \
-  jessie-backports \
-  openjdk-8-jdk \
-  ca-certificates-java -y
+  apt-get -y  update && apt-get install -y -t jessie-backports ca-certificates-java && \
+  apt-get -y install openjdk-8-jdk && update-alternatives --config java 
 
 WORKDIR /usr/src/antidote
-COPY . /usr/src/antidote
 
 RUN set -xe \
   && apt-get update \
   && apt-get install -y --no-install-recommends git openssl ca-certificates
 
 RUN apt-get install erlang-jinterface && \
-  cp -R /usr/lib/erlang/lib/jinterface-1.5.10 /usr/local/lib/erlang/lib/
+  cp -R /usr/lib/erlang/lib/jinterface-* /usr/local/lib/erlang/lib/
 
 RUN git clone "https://github.com/fredlund/JavaErlang.git" && \
   cd JavaErlang && \
   rebar3 compile && \
   echo y | erl -noshell -pa _build/default/lib/java_erlang/ebin -eval "java_erlang_install:install()" -s init stop && \
   cd ..
+
+COPY . /usr/src/antidote
 
 RUN  make clean \
   && make rel \

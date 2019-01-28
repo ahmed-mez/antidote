@@ -2,8 +2,9 @@
 -export([init/0, recv_one_msg/1, send/3, close_socket/1]).
 
 init() ->
+    net_kernel:start([test, shortnames]),
     application:ensure_started(java_erlang),
-    java:set_timeout(infinity),
+    java:set_timeout(infinity),    
     {ok,NodeId} = java:start_node([{add_to_java_classpath,["../bin/vcd.jar"]}]), %% TODO put the vcd file path in some config file
     ZkIP = os:getenv("ZK", "-zk=127.0.0.1:2181"), %% default value is 127.0.0.1:2181 if ZK env var is not set, ZK should respect the format -zk=ip:port
     Conf = java:call_static(NodeId,'org.imdea.vcd.Config',parseArgs,[[ZkIP]]),

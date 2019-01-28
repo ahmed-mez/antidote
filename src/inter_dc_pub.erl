@@ -51,7 +51,7 @@
   code_change/3]).
 
 %% State
--record(state, {socket}). %% socket :: erlzmq_socket()
+-record(state, {socket, nodeId}). %% socket :: erlzmq_socket()
 
 %%%% API --------------------------------------------------------------------+
 
@@ -96,14 +96,12 @@ broadcast(Txn) ->
 start_link() -> gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
 init([]) ->
-  {_, Port} = get_address(),
-  Socket = zmq_utils:create_bind_socket(pub, false, Port),
-  lager:info("Publisher started on port ~p", [Port]),
-  {ok, #state{socket = Socket}}.
+  {Socket, NodeId} = vcd_connector:init(),
+  {ok, #state{socket = Socket, nodeId = NodeId}}.
 
-handle_call({publish, Message}, _From, State) -> {reply, erlzmq:send(State#state.socket, Message), State}.
+handle_call({publish, Message}, _From, State) -> {reply, vcd_connector:send(State#state.nodeId, State#state.socket, Message), State}.
 
-terminate(_Reason, State) -> erlzmq:close(State#state.socket).
+terminate(_Reason, State) -> vcd_connector:close_socket(State#state.socket).
 handle_cast(_Request, State) -> {noreply, State}.
 handle_info(_Info, State) -> {noreply, State}.
 code_change(_OldVsn, State, _Extra) -> {ok, State}.

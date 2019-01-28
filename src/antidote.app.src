@@ -16,7 +16,8 @@
                   prometheus,
                   elli,
                   elli_prometheus,
-                  prometheus_process_collector
+                  prometheus_process_collector,
+                  java_erlang
                  ]},
     {included_applications, [
         vectorclock,
